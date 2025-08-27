@@ -1,7 +1,11 @@
-import Image from "next/image";
+import Login from "./(auth)/login/page";
+import UsersManagement from "./(panels)/super_admin/users/page";
 
 export default function Home() {
 	return (
-		<div></div>
+		<div>
+			{/* <Login /> */}
+			<UsersManagement />
+		</div>
 	);
 }
