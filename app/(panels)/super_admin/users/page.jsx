@@ -15,7 +15,7 @@ const UsersManagement = () => {
         last_name: '',
         email: '',
         phone: '',
-        selectedRole: '',
+        selectedRole: 'super_admin',
     })
     const [editForm, setEditForm] = useState({
         id: '',
@@ -35,6 +35,7 @@ const UsersManagement = () => {
         phone: '',
         selectedRole: '',
     })
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [users, setUsers] = useState([])
@@ -45,6 +46,10 @@ const UsersManagement = () => {
             ...prev,
             [name]: value
         }))
+    }
+
+    const openAddModal = () => {
+        setIsAddModalOpen(true)
     }
 
     const openEditModal = (user) => {
@@ -107,6 +112,7 @@ const UsersManagement = () => {
         e.preventDefault()
         addUser(form)
         console.log(form)
+        setIsAddModalOpen(false)
     }
 
     useEffect(() => {
@@ -119,82 +125,125 @@ const UsersManagement = () => {
 
     return (
         <div>
-            <form>
-                <label htmlFor="name">Name</label>
-                <input
-                    type="text"
-                    id='name'
-                    name='name'
-                    value={form.name}
-                    onChange={handleChange}
-                    className='border border-blue-400 p-3 m-3 rounded-lg w-64 h-16 text-base outline-0'
-                    placeholder='نام را وارد کنید...'
-                />
-                <br /><br />
-                <label htmlFor="father_name">Father Name</label>
-                <input
-                    type="text"
-                    id='father_name'
-                    name='father_name'
-                    value={form.father_name}
-                    onChange={handleChange}
-                    className='border border-blue-400 p-3 m-3 rounded-lg w-64 h-16 text-base outline-0'
-                    placeholder='نام پدر را وارد کنید...'
-                />
-                <br /><br />
-                <label htmlFor="last_name">Last_name</label>
-                <input
-                    type="text"
-                    id='last_name'
-                    name='last_name'
-                    value={form.last_name}
-                    onChange={handleChange}
-                    className='border border-blue-400 p-3 m-3 rounded-lg w-64 h-16 text-base outline-0'
-                    placeholder='تخلص را وارد کنید...'
-                />
-                <br /><br />
-                <label htmlFor="email">Email</label>
-                <input
-                    type="text"
-                    id='email'
-                    name='email'
-                    value={form.email}
-                    onChange={handleChange}
-                    className='border border-blue-400 p-3 m-3 rounded-lg w-64 h-16 text-base outline-0'
-                    placeholder='ایمیل را وارد کنید...'
-                />
-                <br /><br />
-                <label htmlFor="phone">Phone</label>
-                <input
-                    type="number"
-                    id='phone'
-                    name='phone'
-                    value={form.phone}
-                    onChange={handleChange}
-                    className='border border-blue-400 p-3 m-3 rounded-lg w-64 h-16 text-base outline-0'
-                    placeholder='شماره تماس را وارد کنید...'
-                />
-                <br /><br />
-                <label htmlFor="role">Role</label>
-                <select
-                    name="selectedRole"
-                    id="selectedRole"
-                    value={form.selectedRole}
-                    onChange={handleChange}
-                >
-                    <option value="">-- Choose a role --</option>
-                    {roles.map((role, index) => (
-                        <option key={index} value={role}>
-                            {role}
-                        </option>
-                    ))}
-                </select>
-                <br /><br />
-                <button onClick={handleSubmit}>Submit</button>
-            </form>
+            <button onClick={openAddModal}>Add user</button>
+            {isAddModalOpen && (
+                <div className='fixed inset-0 flex items-center justify-center bg-black/20'>
+                    <div className='bg-white rounded-lg p-6 w-[850px] shadow-lg'>
+                        <h2 className='text-xl font-semibold mb-4'>ایجاد کاربر جدید</h2>
+                        <form>
+                            <div className="flex justify-center gap-4">
+                                {/* ستون اول */}
+                                <div className="flex flex-col gap-4 w-96">
+                                    <div className="flex flex-col">
+                                        <label htmlFor="name" className="text-right mb-1 font-medium">نام</label>
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            name="name"
+                                            value={form.name}
+                                            onChange={handleChange}
+                                            className="border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700"
+                                            placeholder="نام را وارد کنید..."
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <label htmlFor="father_name" className="text-right mb-1 font-medium">نام پدر</label>
+                                        <input
+                                            type="text"
+                                            id="father_name"
+                                            name="father_name"
+                                            value={form.father_name}
+                                            onChange={handleChange}
+                                            className="border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700"
+                                            placeholder="نام پدر را وارد کنید..."
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <label htmlFor="last_name" className="text-right mb-1 font-medium">تخلص</label>
+                                        <input
+                                            type="text"
+                                            id="last_name"
+                                            name="last_name"
+                                            value={form.last_name}
+                                            onChange={handleChange}
+                                            className="border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700"
+                                            placeholder="تخلص را وارد کنید..."
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* ستون دوم */}
+                                <div className="flex flex-col gap-4 w-96">
+                                    <div className="flex flex-col">
+                                        <label htmlFor="email" className="text-right mb-1 font-medium">ایمیل</label>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            value={form.email}
+                                            onChange={handleChange}
+                                            className="border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700"
+                                            placeholder="ایمیل را وارد کنید..."
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <label htmlFor="phone" className="text-right mb-1 font-medium">شماره تلفن</label>
+                                        <input
+                                            type="number"
+                                            id="phone"
+                                            name="phone"
+                                            value={form.phone}
+                                            onChange={handleChange}
+                                            className="border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700"
+                                            placeholder="شماره تماس را وارد کنید..."
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <label htmlFor="selectedRole" className="text-right mb-1 font-medium">نقش</label>
+                                        <select
+                                            name="selectedRole"
+                                            id="selectedRole"
+                                            value={form.selectedRole}
+                                            onChange={handleChange}
+                                            className="border border-gray-400 p-1 rounded-lg w-full h-10 text-[14px] outline-none hover:border-gray-500 focus:border-gray-700"
+                                        >
+                                            {/* <option value="">-- یک نقش را انتخاب کنید --</option> */}
+                                            {roles.map((role, index) => (
+                                                <option key={index} value={role}>
+                                                    {role}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center gap-3 mt-6">
+                                <button
+                                    onClick={handleSubmit}
+                                    className="px-6 py-2 w-32 bg-green-400 transition-all hover: text-black rounded-lg"
+                                >
+                                    ثبت کاربر
+                                </button>
+                                <button
+                                    onClick={handleSubmit}
+                                    className='px-6 py-2 w-32 bg-red-400 transition-all hover: text-black rounded-lg'
+                                >
+                                    لغو
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
 
             <div className="overflow-x-auto rounded-lg border border-gray-200">
-                <table className="w-full text-sm text-right border-collapse">
+                <table className="max-w-[1280px] text-sm text-right border-collapse nth-[]:bg-gray-500">
                     <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
                         <tr>
                             <th className="px-4 py-2">Name</th>
@@ -208,7 +257,7 @@ const UsersManagement = () => {
                     </thead>
                     <tbody>
                         {Array.isArray(users) && users.length > 0 ? (users.map((user, index) => (
-                            <tr key={index}>
+                            <tr className='even:bg-gray-200' key={index}>
                                 <td className="px-4 py-2">{user.name}</td>
                                 <td className="px-4 py-2">{user.father_name}</td>
                                 <td className="px-4 py-2">{user.last_name}</td>
@@ -245,68 +294,80 @@ const UsersManagement = () => {
             {/* Edit User Modal */}
             {isEditModalOpen && (
                 <div className='fixed inset-0 flex items-center justify-center bg-black/20'>
-                    <div className='bg-white rounded-lg p-6 w-96 shadow-lg'>
-                        <h2 className='text-xl font-semibold mb-4'>Edit User</h2>
+                    <div className='bg-white rounded-lg p-6 w-[850px] shadow-lg'>
+                        <h2 className='text-xl font-semibold mb-4'>ویرایش اطلاعات کاربر</h2>
                         <form onSubmit={handleEditSubmit}>
-                            <input
-                                type="text"
-                                name='name'
-                                value={editForm.name}
-                                onChange={handleEditChange}
-                                placeholder='Name'
-                                className='border p-2 w-full mb-3 rounded'
-                            />
-                            <input
-                                type="text"
-                                name='father_name'
-                                value={editForm.father_name}
-                                onChange={handleEditChange}
-                                placeholder='Father Name'
-                                className='border p-2 w-full mb-3 rounded'
-                            />
-                            <input
-                                type="text"
-                                name='last_name'
-                                value={editForm.last_name}
-                                onChange={handleEditChange}
-                                placeholder='Last Name'
-                                className='border p-2 w-full mb-3 rounded'
-                            />
-                            <input
-                                type="text"
-                                name='email'
-                                value={editForm.email}
-                                onChange={handleEditChange}
-                                placeholder='Email'
-                                className='border p-2 w-full mb-3 rounded'
-                            />
-                            <input
-                                type="text"
-                                name='phone'
-                                value={editForm.phone}
-                                onChange={handleEditChange}
-                                placeholder='Phone'
-                                className='border p-2 w-full mb-3 rounded'
-                            />
-                            <input
-                                type="text"
-                                name='selectedRole'
-                                value={editForm.selectedRole}
-                                onChange={handleEditChange}
-                                placeholder='Role'
-                                className='border p-2 w-full mb-3 rounded'
-                            />
+                            <div className='flex'>
+                                <div>
+                                    <input
+                                        type="text"
+                                        name='name'
+                                        value={editForm.name}
+                                        onChange={handleEditChange}
+                                        placeholder='Name'
+                                        className='border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700'
+                                    />
+                                    <input
+                                        type="text"
+                                        name='father_name'
+                                        value={editForm.father_name}
+                                        onChange={handleEditChange}
+                                        placeholder='Father Name'
+                                        className='border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700'
+                                    />
+                                    <input
+                                        type="text"
+                                        name='last_name'
+                                        value={editForm.last_name}
+                                        onChange={handleEditChange}
+                                        placeholder='Last Name'
+                                        className='border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700'
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        name='email'
+                                        value={editForm.email}
+                                        onChange={handleEditChange}
+                                        placeholder='Email'
+                                        className='border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700'
+                                    />
+                                    <input
+                                        type="text"
+                                        name='phone'
+                                        value={editForm.phone}
+                                        onChange={handleEditChange}
+                                        placeholder='Phone'
+                                        className='border border-gray-400 p-3 rounded-lg w-full h-10 text-base outline-none hover:border-gray-500 focus:border-gray-700'
+                                    />
+                                    <select
+                                        name="selectedRole"
+                                        id="selectedRole"
+                                        value={editForm.selectedRole}
+                                        onChange={handleChange}
+                                        className="border border-gray-400 p-1 rounded-lg w-full h-10 text-[14px] outline-none hover:border-gray-500 focus:border-gray-700"
+                                    >
+                                        {/* <option value="">-- یک نقش را انتخاب کنید --</option> */}
+                                        {roles.map((role, index) => (
+                                            <option key={index} value={role}>
+                                                {role}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
                             <button
-                                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 shadow-sm transition"
+                                className="px-4 py-2 rounded-lg bg-green-400 text-black shadow-sm transition"
                                 type='submit'
                             >
-                                Save
+                                ذخیره
                             </button>
                             <button
                                 onClick={closeEditModal}
                                 className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
                             >
-                                Cancel
+                                لغو
                             </button>
                         </form>
                     </div>
@@ -314,7 +375,7 @@ const UsersManagement = () => {
             )}
             {isDeleteModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-                    <div className="bg-white rounded-2xl shadow-2xl w-[700px] p-6">
+                    <div className="bg-white rounded-2xl shadow-2xl w-[800px] p-6">
                         {/* Header */}
                         <div className="flex items-center justify-between border-b pb-3">
                             <h2 className="text-2xl font-bold text-red-600">Delete User</h2>

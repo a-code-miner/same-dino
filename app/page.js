@@ -1,11 +1,11 @@
 import Login from "./(auth)/login/page";
-import UsersManagement from "./(panels)/super_admin/users/page";
+import SAPanel from "./(panels)/super_admin/page";
 
 export default function Home() {
 	return (
 		<div>
 			{/* <Login /> */}
-			<UsersManagement />
+			<SAPanel />
 		</div>
 	);
 }
