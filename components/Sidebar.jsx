@@ -19,8 +19,8 @@ const Sidebar = () => {
                 <BsClockHistory />
                 تاریخچه سفارش‌ها
             </Link>
-            <Link href={'/super_admin/users'}>
-                مدیریت کاربران
+            <Link className={pathName === '/super_admin/sales_history' ? `flex justify-start items-center gap-2 w-full text-blue-800 bg-blue-100 px-4 py-3 rounded-lg` : 'flex items-center justify-start gap-2 w-full'} href={'/super_admin/sales_history'}>
+                تاریخچه فروش‌ها
             </Link>
             <Link href={'/super_admin/users'}>
                 مدیریت کاربران

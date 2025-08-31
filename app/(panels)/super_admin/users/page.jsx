@@ -72,28 +72,22 @@ const UsersManagement = () => {
 
     const [form, setForm] = useState({
         name: '',
-        father_name: '',
-        last_name: '',
         email: '',
-        phone: '',
+        password: '',
         selectedRole: 'super_admin',
     })
     const [editForm, setEditForm] = useState({
         id: '',
         name: '',
-        father_name: '',
-        last_name: '',
         email: '',
-        phone: '',
+        password: '',
         selectedRole: '',
     })
     const [deleteForm, setDeleteForm] = useState({
         id: '',
         name: '',
-        father_name: '',
-        last_name: '',
         email: '',
-        phone: '',
+        password: '',
         selectedRole: '',
     })
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -122,10 +116,8 @@ const UsersManagement = () => {
         setEditForm({
             id: user.id || '',
             name: user.name || '',
-            father_name: user.father_name || '',
-            last_name: user.last_name || '',
             email: user.email || '',
-            phone: user.phone || '',
+            password: user.password || '',
             selectedRole: user.selectedRole || 'super_admin',
         })
         setIsEditModalOpen(true)
@@ -155,10 +147,8 @@ const UsersManagement = () => {
         setDeleteForm({
             id: user.id || '',
             name: user.name || '',
-            father_name: user.father_name || '',
-            last_name: user.last_name || '',
             email: user.email || '',
-            phone: user.phone || '',
+            password: user.password || '',
             selectedRole: user.selectedRole || '',
         })
         setIsDeleteModalOpen(true)
@@ -234,10 +224,8 @@ const UsersManagement = () => {
                                 <thead className="bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 uppercase text-sm">
                                     <tr className='text-nowrap'>
                                         <th className="px-6 py-4 font-semibold">نام</th>
-                                        <th className="px-6 py-4 font-semibold">نام پدر</th>
-                                        <th className="px-6 py-4 font-semibold">تخلص</th>
                                         <th className="px-6 py-4 font-semibold">ایمیل</th>
-                                        <th className="px-6 py-4 font-semibold">شماره تلفن</th>
+                                        <th className="px-6 py-4 font-semibold">رمز عبور</th>
                                         <th className="px-6 py-4 font-semibold">نقش</th>
                                         <th className="px-6 py-4 font-semibold">عملیات</th>
                                     </tr>
@@ -247,10 +235,8 @@ const UsersManagement = () => {
                                         users.map((user, index) => (
                                             <tr key={index} className="hover:bg-gray-50 transition-colors text-nowrap">
                                                 <td className="px-6 py-4">{user.name}</td>
-                                                <td className="px-6 py-4">{user.father_name}</td>
-                                                <td className="px-6 py-4">{user.last_name}</td>
                                                 <td className="px-6 py-4">{user.email}</td>
-                                                <td className="px-6 py-4">{user.phone}</td>
+                                                <td className="px-6 py-4">{user.password}</td>
                                                 <td className="px-6 py-4">
                                                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${user.selectedRole === 'super_admin' ? 'bg-purple-100 text-purple-800' :
                                                         user.selectedRole === 'school_admin' ? 'bg-blue-100 text-blue-800' :
@@ -310,22 +296,6 @@ const UsersManagement = () => {
                                     inputRef={nameInputRef}
                                 />
                                 <InputField
-                                    label="نام پدر"
-                                    id="father_name"
-                                    name="father_name"
-                                    value={form.father_name}
-                                    onChange={handleChange}
-                                    placeholder="نام پدر را وارد کنید..."
-                                />
-                                <InputField
-                                    label="تخلص"
-                                    id="last_name"
-                                    name="last_name"
-                                    value={form.last_name}
-                                    onChange={handleChange}
-                                    placeholder="تخلص را وارد کنید..."
-                                />
-                                <InputField
                                     label="ایمیل"
                                     id="email"
                                     name="email"
@@ -335,13 +305,13 @@ const UsersManagement = () => {
                                     placeholder="ایمیل را وارد کنید..."
                                 />
                                 <InputField
-                                    label="شماره تلفن"
-                                    id="phone"
-                                    name="phone"
-                                    type="tel"
-                                    value={form.phone}
+                                    label="رمز عبور"
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    value={form.password}
                                     onChange={handleChange}
-                                    placeholder="شماره تماس را وارد کنید..."
+                                    placeholder="رمز عبور را وارد کنید..."
                                 />
                                 <InputField
                                     label="نقش"
@@ -388,22 +358,6 @@ const UsersManagement = () => {
                                     placeholder="نام"
                                 />
                                 <InputField
-                                    label="نام پدر"
-                                    id="edit-father_name"
-                                    name="father_name"
-                                    value={editForm.father_name}
-                                    onChange={handleEditChange}
-                                    placeholder="نام پدر"
-                                />
-                                <InputField
-                                    label="تخلص"
-                                    id="edit-last_name"
-                                    name="last_name"
-                                    value={editForm.last_name}
-                                    onChange={handleEditChange}
-                                    placeholder="تخلص"
-                                />
-                                <InputField
                                     label="ایمیل"
                                     id="edit-email"
                                     name="email"
@@ -413,13 +367,13 @@ const UsersManagement = () => {
                                     placeholder="ایمیل"
                                 />
                                 <InputField
-                                    label="شماره تلفن"
-                                    id="edit-phone"
-                                    name="phone"
-                                    type="tel"
-                                    value={editForm.phone}
+                                    label="رمز عبور"
+                                    id="edit-password"
+                                    name="password"
+                                    type="password"
+                                    value={editForm.password}
                                     onChange={handleEditChange}
-                                    placeholder="شماره تلفن"
+                                    placeholder="رمز عبور"
                                 />
                                 <InputField
                                     label="نقش"

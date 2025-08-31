@@ -4,7 +4,7 @@ import Link from 'next/link'
 const SAPanel = () => {
     return (
         <div>
-            <Link href={`/super_admin/users`}>User Management</Link>
+            {/* <Link href={`/super_admin/users`}>User Management</Link> */}
         </div>
     )
 }
