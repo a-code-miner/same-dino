@@ -1,1 +1,10 @@
+@font-face {
+  font-family: "IRANSans";
+  src: url("public/fonts/IRANSans.ttf") format(truetype);
+}
+
 @import "tailwindcss";
+
+body {
+  font-family: "IRANSans";
+}

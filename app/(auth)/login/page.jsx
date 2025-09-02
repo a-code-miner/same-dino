@@ -1,55 +1,90 @@
-'use client'
-import React from 'react'
-import { useState } from 'react'
-
-import { login } from '@/lib/api'
+"use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { login } from "@/lib/api";
 
 const Login = () => {
-    const [form, setForm] = useState({
-        email: '',
-        password: '',
-    })
+  const router = useRouter();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
 
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        setForm((prev) => ({
-            ...prev,
-            [name]: value
-        }))
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    let newErrors = {};
+    if (!form.email.includes("@")) {
+      newErrors.email = "لطفاً یک ایمیل معتبر وارد کنید.";
+    }
+    if (!form.password) {
+      newErrors.password = "رمز عبور الزامی است.";
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        login(form.email, form.password)
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
-    return (
-        <div>
-            <form onSubmit={(e) => e.preventDefault()}>
-                <label htmlFor="email">ایمیل</label>
-                <input
-                    type="text"
-                    id='email'
-                    name='email'
-                    value={form.email}
-                    onChange={handleChange}
-                    className='border border-blue-400 p-3 m-3 rounded-lg w-64 h-16 text-base outline-0'
-                    placeholder='ایمیل خود را وارد کنید...'
-                />
 
-                <label htmlFor="password">رمز عبور</label>
-                <input
-                    type="password"
-                    id='password'
-                    name='password'
-                    value={form.password}
-                    onChange={handleChange}
-                    className='border border-blue-400 p-3 m-3 rounded-lg w-64 h-16 text-base outline-0'
-                    placeholder='رمز عبور خودر را وارد کنید...'
-                />
-                <button onClick={handleSubmit}>ورود</button>
-            </form>
-        </div>
-    )
-}
+    try {
+      const loginResult = await login(form.email, form.password);
+      if (loginResult.user && loginResult.user.role === "super_admin") {
+        router.push("/super_admin");
+      } else {
+        console.log("کاربر دسترسی ندارد یا اطلاعات اشتباه است!");
+      }
+    } catch (err) {
+      console.log("خطا در لاگین:", err);
+    }
+  };
 
-export default Login
+  return (
+    <div className="h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white shadow-lg rounded-2xl p-8 w-96">
+        <h1 className="text-2xl font-semibold text-center mb-6">ورود</h1>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-lg">
+          <div>
+            <input
+              type="text"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="ایمیل..."
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="رمز عبور..."
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-gray-200 text-gray-800 font-medium py-3 rounded-lg hover:bg-gray-300 transition-colors"
+          >
+            ورود
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
