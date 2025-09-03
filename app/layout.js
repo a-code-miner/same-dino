@@ -17,8 +17,7 @@ export default function RootLayout({ children }) {
         {showSidebar && <Sidebar />}
         {showSidebar && <TopBar />}
         <main
-          style={{ height: "calc(100vh - 56px)" }}
-          className="fixed top-14 right-64 left-0 overflow-auto"
+          className={`${showSidebar ? "mt-14" : "mt-0"} h-full overflow-auto`}
         >
           {children}
         </main>

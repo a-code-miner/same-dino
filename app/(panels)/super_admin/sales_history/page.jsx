@@ -50,7 +50,7 @@ const SalesHistory = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">تاریخچه سفارش‌ها</h1>
+          <h1 className="text-3xl font-bold text-gray-800">تاریخچه فروش‌ها</h1>
         </div>
         <div className="bg-white rounded-2xl shadow-md overflow-hidden">
           {loading ? (

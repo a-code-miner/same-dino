@@ -60,46 +60,179 @@ const OrdersHistory = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-right">
+              <table className="w-full text-right border-collapse">
                 <thead className="bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 uppercase text-sm">
                   <tr className="text-nowrap">
-                    <th className="px-6 py-4 font-semibold">آیدی</th>
-                    <th className="px-6 py-4 font-semibold">تاریخ</th>
-                    <th className="px-6 py-4 font-semibold">ساعت</th>
-                    <th className="px-6 py-4 font-semibold">نام جنس</th>
-                    <th className="px-6 py-4 font-semibold">قیمت</th>
-                    <th className="px-6 py-4 font-semibold">مقدار</th>
-                    <th className="px-6 py-4 font-semibold">نام سفارش‌دهنده</th>
-                    <th className="px-6 py-4 font-semibold">فروشنده</th>
-                    <th className="px-6 py-4 font-semibold">نام فرزند</th>
-                    <th className="px-6 py-4 font-semibold">آیدی فرزند</th>
+                    <th className="px-4 py-4 font-semibold border border-blue-200">
+                      آیدی
+                    </th>
+
+                    <th
+                      className="px-4 py-4 font-semibold border border-blue-200"
+                      colSpan="2"
+                    >
+                      والدین
+                    </th>
+
+                    <th
+                      className="px-4 py-4 font-semibold border border-blue-200"
+                      colSpan="2"
+                    >
+                      شاگرد
+                    </th>
+
+                    <th
+                      className="px-4 py-4 font-semibold border border-blue-200"
+                      colSpan={4}
+                    >
+                      اجناس
+                    </th>
+                    <th className="px-4 py-4 font-semibold border border-blue-200">
+                      قیمت مجموعی
+                    </th>
+
+                    <th className="px-4 py-4 font-semibold border border-blue-200">
+                      وضعیت
+                    </th>
+
+                    <th className="px-4 py-4 font-semibold border border-blue-200">
+                      زمان سفارش
+                    </th>
+                    <th className="px-4 py-4 font-semibold border border-blue-200">
+                      زمان تحویل
+                    </th>
+                    <th
+                      className="px-4 py-4 font-semibold border border-blue-200"
+                      colSpan={2}
+                    >
+                      فروشنده
+                    </th>
+                  </tr>
+                  <tr className="bg-blue-50 text-nowrap">
+                    <th className="px-4 py-3 font-medium border border-blue-200"></th>
+
+                    {/* زیرستون‌های خریدار */}
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      آیدی والدین
+                    </th>
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      نام والدین
+                    </th>
+
+                    {/* زیرستون‌های جنس */}
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      آیدی شاگرد
+                    </th>
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      نام شاگرد
+                    </th>
+
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      آیدی جنس
+                    </th>
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      نام جنس
+                    </th>
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      قیمت جنس
+                    </th>
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      تعداد جنس
+                    </th>
+
+                    {/* زیرستون‌های فروشنده */}
+                    <th className="px-4 py-3 font-medium border border-blue-200"></th>
+                    <th className="px-4 py-3 font-medium border border-blue-200"></th>
+                    <th className="px-4 py-3 font-medium border border-blue-200"></th>
+                    <th className="px-4 py-3 font-medium border border-blue-200"></th>
+
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      آیدی فروشنده
+                    </th>
+                    <th className="px-4 py-3 font-medium border border-blue-200">
+                      نام فروشنده
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {Array.isArray(ordersHistory) && ordersHistory.length > 0 ? (
-                    ordersHistory.map((orderHistory, index) => (
+                    ordersHistory.map((sale, index) => (
                       <tr
                         key={index}
                         className="hover:bg-gray-50 transition-colors text-nowrap"
                       >
-                        <td className="px-6 py-4">{orderHistory.id}</td>
-                        <td className="px-6 py-4">{orderHistory.order_date}</td>
-                        <td className="px-6 py-4">{orderHistory.hour}</td>
-                        <td className="px-6 py-4">{orderHistory.product}</td>
-                        <td className="px-6 py-4">{orderHistory.price}</td>
-                        <td className="px-6 py-4">{orderHistory.quantity}</td>
-                        <td className="px-6 py-4">
-                          {orderHistory.orderer_name}
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.id}
                         </td>
-                        <td className="px-6 py-4">{orderHistory.seller}</td>
-                        <td className="px-6 py-4">{orderHistory.child_name}</td>
-                        <td className="px-6 py-4">{orderHistory.child_id}</td>
+
+                        {/* اطلاعات خریدار */}
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.parents.id}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.parents.name}
+                        </td>
+
+                        {/* اطلاعات جنس */}
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.student.id}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.student.name}
+                        </td>
+
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.products.id}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.products.name}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.products.price}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.products.quantity}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.total_price}
+                        </td>
+
+                        {/* اطلاعات فروشنده */}
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.status}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.order_date_time}
+                        </td>
+
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.sale_date_time}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.seller.id}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.seller.name}
+                        </td>
+                        {/* <td className="px-4 py-4 border border-gray-200">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              sale.status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {sale.status === "completed"
+                              ? "تکمیل شده"
+                              : sale.status}
+                          </span>
+                        </td> */}
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td
-                        colSpan={7}
+                        colSpan={13}
                         className="px-6 py-8 text-center text-gray-500"
                       >
                         تاریخچه سفارش‌ها خالی است.
