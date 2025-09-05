@@ -6,6 +6,8 @@ import React from "react";
 import { FiUsers } from "react-icons/fi";
 import { BsClockHistory } from "react-icons/bs";
 import { FaSellsy } from "react-icons/fa6";
+import { PiShippingContainerFill } from "react-icons/pi";
+import { ImQrcode } from "react-icons/im";
 
 const Sidebar = () => {
   const pathName = usePathname();
@@ -45,8 +47,28 @@ const Sidebar = () => {
         <FaSellsy />
         تاریخچه فروش‌ها
       </Link>
-      <Link href={"/super_admin/users"}>مدیریت کاربران</Link>
-      <Link href={"/super_admin/users"}>مدیریت کاربران</Link>
+      <Link
+        className={
+          pathName === "/super_admin/products"
+            ? `flex justify-start items-center gap-2 w-full text-blue-800 bg-blue-100 px-4 py-3 rounded-lg`
+            : "flex items-center justify-start gap-2 w-full"
+        }
+        href={"/super_admin/products"}
+      >
+        <PiShippingContainerFill />
+        مشاهده اجناس
+      </Link>
+      <Link
+        className={
+          pathName === "/super_admin/qrcards"
+            ? `flex justify-start items-center gap-2 w-full text-blue-800 bg-blue-100 px-4 py-3 rounded-lg`
+            : "flex items-center justify-start gap-2 w-full"
+        }
+        href={"/super_admin/qrcards"}
+      >
+        <ImQrcode />
+        ساخت کد QR
+      </Link>
     </div>
   );
 };
