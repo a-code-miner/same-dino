@@ -1,10 +1,13 @@
+// app/(auth)/login/page.js
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const router = useRouter();
+  const { login: authLogin } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
 
@@ -31,10 +34,23 @@ const Login = () => {
 
     try {
       const loginResult = await login(form.email, form.password);
-      if (loginResult.user && loginResult.user.role === "super_admin") {
-        router.push("/super_admin");
-      } else {
-        console.log("کاربر دسترسی ندارد یا اطلاعات اشتباه است!");
+
+      if (loginResult.user) {
+        // استفاده از Context برای به روزرسانی وضعیت کاربر
+        authLogin(loginResult.user);
+
+        // هدایت بر اساس نقش
+        if (loginResult.user.role === "super_admin") {
+          router.push("/super_admin");
+        } else if (loginResult.user.role === "canteen") {
+          router.push("/canteen");
+        } else if (loginResult.user.role === "parents") {
+          router.push("/parents");
+        } else if (loginResult.user.role === "school_manager") {
+          router.push("/school_manager");
+        } else {
+          router.push("/");
+        }
       }
     } catch (err) {
       console.log("خطا در لاگین:", err);

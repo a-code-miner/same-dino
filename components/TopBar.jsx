@@ -25,6 +25,7 @@ const TopBar = () => {
       if (logOutResult) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("username");
+        localStorage.removeItem("role");
         router.push("/");
       }
       return;
