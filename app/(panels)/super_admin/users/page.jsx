@@ -1,7 +1,13 @@
 "use client";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { FaEdit, FaPlus, FaTimes } from "react-icons/fa";
+import {
+  FaEdit,
+  FaPlus,
+  FaTimes,
+  FaChevronRight,
+  FaChevronLeft,
+} from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
 import { getUsers, addUser, updateUser, deleteUser } from "@/lib/api";
@@ -74,6 +80,12 @@ const InputField = ({
 const UsersManagement = () => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    per_page: 15,
+    total: 0,
+  });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
@@ -159,7 +171,7 @@ const UsersManagement = () => {
     await updateUser(editForm.id, editForm);
     console.log("User updated: ", editForm);
     setIsEditModalOpen(false);
-    fetchUsers();
+    fetchUsers(pagination.current_page);
   };
 
   const openDeleteModal = (user) => {
@@ -178,7 +190,7 @@ const UsersManagement = () => {
     await deleteUser(deleteForm.id);
     console.log("User deleted: ", deleteForm);
     setIsDeleteModalOpen(false);
-    fetchUsers();
+    fetchUsers(pagination.current_page);
   };
 
   const closeDeleteModal = () => {
@@ -190,7 +202,7 @@ const UsersManagement = () => {
     await addUser(form);
     console.log(form);
     setIsAddModalOpen(false);
-    fetchUsers();
+    fetchUsers(pagination.current_page);
     setForm({
       name: "",
       email: "",
@@ -199,15 +211,27 @@ const UsersManagement = () => {
     });
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = 1) => {
     setLoading(true);
     try {
-      const data = await getUsers();
-      setUsers(data);
+      const data = await getUsers(page);
+      setUsers(data.data || []);
+      setPagination({
+        current_page: data.current_page,
+        last_page: data.last_page,
+        per_page: data.per_page,
+        total: data.total,
+      });
     } catch (err) {
       console.error("Error fetching users:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const changePage = (page) => {
+    if (page >= 1 && page <= pagination.last_page) {
+      fetchUsers(page);
     }
   };
 
@@ -234,6 +258,75 @@ const UsersManagement = () => {
       </div>
     );
   }
+
+  // تابع برای تولید دکمه‌های صفحه‌بندی
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(
+      1,
+      pagination.current_page - Math.floor(maxVisiblePages / 2)
+    );
+    let endPage = Math.min(
+      pagination.last_page,
+      startPage + maxVisiblePages - 1
+    );
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // دکمه قبلی
+    buttons.push(
+      <button
+        key="prev"
+        onClick={() => changePage(pagination.current_page - 1)}
+        disabled={pagination.current_page === 1}
+        className={`px-3 py-1 rounded-lg ${
+          pagination.current_page === 1
+            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        }`}
+      >
+        <FaChevronRight />
+      </button>
+    );
+
+    // دکمه‌های شماره صفحات
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => changePage(i)}
+          className={`px-3 py-1 rounded-lg ${
+            i === pagination.current_page
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    // دکمه بعدی
+    buttons.push(
+      <button
+        key="next"
+        onClick={() => changePage(pagination.current_page + 1)}
+        disabled={pagination.current_page === pagination.last_page}
+        className={`px-3 py-1 rounded-lg ${
+          pagination.current_page === pagination.last_page
+            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        }`}
+      >
+        <FaChevronLeft />
+      </button>
+    );
+
+    return buttons;
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -326,6 +419,20 @@ const UsersManagement = () => {
                   )}
                 </tbody>
               </table>
+              {pagination.last_page > 1 && (
+                <div className="flex justify-between items-center p-4 border-t border-gray-200">
+                  <div className="text-sm text-gray-600">
+                    نمایش{" "}
+                    {(pagination.current_page - 1) * pagination.per_page + 1} تا{" "}
+                    {Math.min(
+                      pagination.current_page * pagination.per_page,
+                      pagination.total
+                    )}{" "}
+                    از {pagination.total} نتیجه
+                  </div>
+                  <div className="flex gap-2">{renderPaginationButtons()}</div>
+                </div>
+              )}
             </div>
           )}
         </div>

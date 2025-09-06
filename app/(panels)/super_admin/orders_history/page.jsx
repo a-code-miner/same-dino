@@ -1,38 +1,120 @@
 "use client";
 import { getOrdersHistory } from "@/lib/api";
 import React, { useEffect, useState } from "react";
-import { FaEdit, FaPlus } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 
 const OrdersHistory = () => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [ordersHistory, setOrdersHistory] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+  });
+  const [filters, setFilters] = useState({
+    from: "",
+    to: "",
+    student_id: "",
+    status: "",
+  });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
     setToken(storedToken);
-    setLoading(false);
   }, []);
 
-  const [ordersHistory, setOrdersHistory] = useState([]);
-
-  const fetchOrdersHistory = async () => {
+  const fetchOrdersHistory = async (page = 1) => {
     setLoading(true);
     try {
-      const data = await getOrdersHistory();
-      setOrdersHistory(data);
+      const params = {
+        ...filters,
+        page,
+        limit: pagination.limit,
+      };
+      const data = await getOrdersHistory(params);
+
+      // بررسی وجود data.data و اینکه آرایه است
+      const ordersData = Array.isArray(data?.data) ? data.data : [];
+
+      // تبدیل داده‌های تودرتو به فرمت مسطح برای نمایش در جدول
+      const flattenedData = ordersData.flatMap((order) =>
+        Array.isArray(order?.items)
+          ? order.items.map((item) => ({
+              order_id: order.id,
+              parent: order.parent || {},
+              student: order.student || {},
+              product: item,
+              total_price: order.total_price,
+              status: order.status,
+              order_date_time: order.order_date_time,
+              delivered_at: order.delivered_at,
+              seller: order.seller || {},
+            }))
+          : []
+      );
+
+      setOrdersHistory(flattenedData);
+      setPagination({
+        page: data.pagination?.page || 1,
+        limit: data.pagination?.limit || 10,
+        total: data.pagination?.total || 0,
+      });
     } catch (err) {
       console.log("Error fetching orders history: ", err);
+      setOrdersHistory([]);
+      setPagination({
+        page: 1,
+        limit: 10,
+        total: 0,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOrdersHistory();
-  }, []);
+    if (token) {
+      fetchOrdersHistory(1);
+    }
+  }, [token, filters]);
 
-  if (loading) return null;
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePageChange = (newPage) => {
+    if (
+      newPage >= 1 &&
+      newPage <= Math.ceil(pagination.total / pagination.limit)
+    ) {
+      fetchOrdersHistory(newPage);
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "delivered":
+        return "تحویل شده";
+      case "pending":
+        return "در انتظار";
+      case "cancelled":
+        return "لغو شده";
+      default:
+        return status;
+    }
+  };
+
+  const formatDateTime = (dateTimeString) => {
+    if (!dateTimeString) return "-";
+    const date = new Date(dateTimeString);
+    return date.toLocaleString("fa-IR");
+  };
+
   if (!token) {
     return (
       <div className="h-screen flex flex-col justify-center items-center">
@@ -53,6 +135,68 @@ const OrdersHistory = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">تاریخچه سفارش‌ها</h1>
         </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">فیلترها</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                از تاریخ
+              </label>
+              <input
+                type="date"
+                name="from"
+                value={filters.from}
+                onChange={handleFilterChange}
+                className="w-full border border-gray-300 rounded-lg p-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                تا تاریخ
+              </label>
+              <input
+                type="date"
+                name="to"
+                value={filters.to}
+                onChange={handleFilterChange}
+                className="w-full border border-gray-300 rounded-lg p-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                آیدی شاگرد
+              </label>
+              <input
+                type="number"
+                name="student_id"
+                value={filters.student_id}
+                onChange={handleFilterChange}
+                className="w-full border border-gray-300 rounded-lg p-2"
+                placeholder="آیدی شاگرد"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                وضعیت
+              </label>
+              <select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="w-full border border-gray-300 rounded-lg p-2"
+              >
+                <option value="">همه</option>
+                <option value="delivered">تحویل شده</option>
+                <option value="pending">در انتظار</option>
+                <option value="cancelled">لغو شده</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Table */}
         <div className="bg-white rounded-2xl shadow-md overflow-hidden">
           {loading ? (
             <div className="flex justify-center items-center py-20">
@@ -64,23 +208,20 @@ const OrdersHistory = () => {
                 <thead className="bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 uppercase text-sm">
                   <tr className="text-nowrap">
                     <th className="px-4 py-4 font-semibold border border-blue-200">
-                      آیدی
+                      آیدی سفارش
                     </th>
-
                     <th
                       className="px-4 py-4 font-semibold border border-blue-200"
                       colSpan="2"
                     >
                       والدین
                     </th>
-
                     <th
                       className="px-4 py-4 font-semibold border border-blue-200"
                       colSpan="2"
                     >
                       شاگرد
                     </th>
-
                     <th
                       className="px-4 py-4 font-semibold border border-blue-200"
                       colSpan={4}
@@ -90,11 +231,9 @@ const OrdersHistory = () => {
                     <th className="px-4 py-4 font-semibold border border-blue-200">
                       قیمت مجموعی
                     </th>
-
                     <th className="px-4 py-4 font-semibold border border-blue-200">
                       وضعیت
                     </th>
-
                     <th className="px-4 py-4 font-semibold border border-blue-200">
                       زمان سفارش
                     </th>
@@ -110,23 +249,18 @@ const OrdersHistory = () => {
                   </tr>
                   <tr className="bg-blue-50 text-nowrap">
                     <th className="px-4 py-3 font-medium border border-blue-200"></th>
-
-                    {/* زیرستون‌های خریدار */}
                     <th className="px-4 py-3 font-medium border border-blue-200">
                       آیدی والدین
                     </th>
                     <th className="px-4 py-3 font-medium border border-blue-200">
                       نام والدین
                     </th>
-
-                    {/* زیرستون‌های جنس */}
                     <th className="px-4 py-3 font-medium border border-blue-200">
                       آیدی شاگرد
                     </th>
                     <th className="px-4 py-3 font-medium border border-blue-200">
                       نام شاگرد
                     </th>
-
                     <th className="px-4 py-3 font-medium border border-blue-200">
                       آیدی جنس
                     </th>
@@ -139,13 +273,10 @@ const OrdersHistory = () => {
                     <th className="px-4 py-3 font-medium border border-blue-200">
                       تعداد جنس
                     </th>
-
-                    {/* زیرستون‌های فروشنده */}
                     <th className="px-4 py-3 font-medium border border-blue-200"></th>
                     <th className="px-4 py-3 font-medium border border-blue-200"></th>
                     <th className="px-4 py-3 font-medium border border-blue-200"></th>
                     <th className="px-4 py-3 font-medium border border-blue-200"></th>
-
                     <th className="px-4 py-3 font-medium border border-blue-200">
                       آیدی فروشنده
                     </th>
@@ -155,84 +286,63 @@ const OrdersHistory = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {Array.isArray(ordersHistory) && ordersHistory.length > 0 ? (
+                  {ordersHistory.length > 0 ? (
                     ordersHistory.map((sale, index) => (
                       <tr
                         key={index}
                         className="hover:bg-gray-50 transition-colors text-nowrap"
                       >
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.id}
-                        </td>
-
-                        {/* اطلاعات خریدار */}
-                        <td className="px-4 py-4 border border-gray-200">
-                          {sale.parents.id}
+                          {sale.order_id}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.parents.name}
-                        </td>
-
-                        {/* اطلاعات جنس */}
-                        <td className="px-4 py-4 border border-gray-200">
-                          {sale.student.id}
+                          {sale.parent?.id || "-"}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.student.name}
-                        </td>
-
-                        <td className="px-4 py-4 border border-gray-200">
-                          {sale.products.id}
+                          {sale.parent?.name || "-"}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.products.name}
+                          {sale.student?.id || "-"}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.products.price}
+                          {sale.student?.name || "-"}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.products.quantity}
+                          {sale.product?.product_id || "-"}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.product?.name || "-"}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.product?.price || "-"}
+                        </td>
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.product?.quantity || "-"}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
                           {sale.total_price}
                         </td>
-
-                        {/* اطلاعات فروشنده */}
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.status}
+                          {getStatusText(sale.status)}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.order_date_time}
-                        </td>
-
-                        <td className="px-4 py-4 border border-gray-200">
-                          {sale.sale_date_time}
+                          {formatDateTime(sale.order_date_time)}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.seller.id}
+                          {formatDateTime(sale.delivered_at)}
                         </td>
                         <td className="px-4 py-4 border border-gray-200">
-                          {sale.seller.name}
+                          {sale.seller?.id || "-"}
                         </td>
-                        {/* <td className="px-4 py-4 border border-gray-200">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              sale.status === "completed"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {sale.status === "completed"
-                              ? "تکمیل شده"
-                              : sale.status}
-                          </span>
-                        </td> */}
+                        <td className="px-4 py-4 border border-gray-200">
+                          {sale.seller?.name || "-"}
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td
-                        colSpan={13}
+                        colSpan={15}
                         className="px-6 py-8 text-center text-gray-500"
                       >
                         تاریخچه سفارش‌ها خالی است.
@@ -244,6 +354,61 @@ const OrdersHistory = () => {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {pagination.total > 0 && (
+          <div className="flex justify-between items-center mt-4">
+            <div className="text-sm text-gray-600">
+              نمایش {(pagination.page - 1) * pagination.limit + 1} تا{" "}
+              {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
+              از {pagination.total} سفارش
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className={`px-3 py-1 rounded-lg ${
+                  pagination.page === 1
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                <FaChevronRight />
+              </button>
+              {Array.from(
+                { length: Math.ceil(pagination.total / pagination.limit) },
+                (_, i) => i + 1
+              ).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-3 py-1 rounded-lg ${
+                    page === pagination.page
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={
+                  pagination.page ===
+                  Math.ceil(pagination.total / pagination.limit)
+                }
+                className={`px-3 py-1 rounded-lg ${
+                  pagination.page ===
+                  Math.ceil(pagination.total / pagination.limit)
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                <FaChevronLeft />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

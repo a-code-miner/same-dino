@@ -100,7 +100,7 @@ const QRCardsGen = () => {
             name="student_id"
             value={formStudentQRCode.student_id}
             onChange={handleChange}
-            placeholder="نام را وارد کنید..."
+            placeholder="آیدی شاگرد را وارد کنید..."
           />
           <button
             type="submit"
