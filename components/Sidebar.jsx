@@ -38,7 +38,7 @@ const Sidebar = () => {
       icon: <PiShippingContainerFill />,
     },
     {
-      href: "/school_admin",
+      href: "/school_manager",
       label: "داشبورد مدیر مدرسه",
       icon: <PiShippingContainerFill />,
     },
