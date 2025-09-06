@@ -7,6 +7,7 @@ import {
   FaTimes,
   FaChevronRight,
   FaChevronLeft,
+  FaFilter,
 } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
@@ -86,6 +87,8 @@ const UsersManagement = () => {
     per_page: 15,
     total: 0,
   });
+  const [error, setError] = useState({ show: false, message: "" });
+  const [filterRole, setFilterRole] = useState("");
 
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
@@ -95,7 +98,15 @@ const UsersManagement = () => {
 
   const nameInputRef = useRef();
 
-  const roles = [
+  const filterRoles = [
+    { value: "", label: "همه کاربران" },
+    { value: "super_admin", label: "مدیر کل" },
+    { value: "school_manager", label: "مدیر مکتب" },
+    { value: "canteen", label: "مسئول کانتین" },
+    { value: "parents", label: "والدین" },
+  ];
+
+  const formRoles = [
     { value: "super_admin", label: "مدیر کل" },
     { value: "school_manager", label: "مدیر مکتب" },
     { value: "canteen", label: "مسئول کانتین" },
@@ -126,6 +137,16 @@ const UsersManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
+
+  // تابع برای بستن مدال خطا
+  const closeErrorModal = () => {
+    setError({ show: false, message: "" });
+  };
+
+  // تابع برای نمایش خطا
+  const showError = (message) => {
+    setError({ show: true, message });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -166,12 +187,54 @@ const UsersManagement = () => {
     }));
   };
 
+  // تغییر در تابع handleEditSubmit برای مدیریت خطاهای ویرایش کاربر
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    await updateUser(editForm.id, editForm);
-    console.log("User updated: ", editForm);
-    setIsEditModalOpen(false);
-    fetchUsers(pagination.current_page);
+    try {
+      await updateUser(editForm.id, editForm);
+      setIsEditModalOpen(false);
+      fetchUsers(pagination.current_page);
+    } catch (err) {
+      console.error("Error updating user:", err);
+      let message = "خطای ناشناخته ای رخ داد";
+
+      if (err.status === 422 && err.errors) {
+        // خطاهای اعتبارسنجی - تبدیل به رشته قابل نمایش
+        const errorMessages = [];
+        for (const field in err.errors) {
+          errorMessages.push(...err.errors[field]);
+        }
+        message = errorMessages.join("، ");
+      } else {
+        switch (err.status) {
+          case 400:
+            if (err.error === "invalid_field") {
+              message = "ایمیل وارد شده معتبر نیست";
+            } else if (err.error === "duplicate_email") {
+              message = "ایمیل قبلاً استفاده شده است";
+            } else if (err.message) {
+              message = err.message;
+            }
+            break;
+          case 401:
+            message = "ابتدا باید وارد شوید";
+            break;
+          case 403:
+            message = "شما مجوز تغییر این کاربر را ندارید";
+            break;
+          case 404:
+            message = "کاربر مورد نظر یافت نشد";
+            break;
+          case 500:
+            message = "خطای داخلی سرور رخ داد";
+            break;
+          default:
+            message = err.message || "خطای ناشناخته";
+        }
+      }
+
+      showError(message);
+    }
   };
 
   const openDeleteModal = (user) => {
@@ -185,36 +248,108 @@ const UsersManagement = () => {
     setIsDeleteModalOpen(true);
   };
 
+  // تغییر در تابع handleDeleteSubmit برای مدیریت خطاهای حذف کاربر
   const handleDeleteSubmit = async (e) => {
     e.preventDefault();
-    await deleteUser(deleteForm.id);
-    console.log("User deleted: ", deleteForm);
-    setIsDeleteModalOpen(false);
-    fetchUsers(pagination.current_page);
+    try {
+      await deleteUser(deleteForm.id);
+      setIsDeleteModalOpen(false);
+      fetchUsers(pagination.current_page);
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      let message = "خطای ناشناخته ای رخ داد";
+
+      if (err.status === 422 && err.errors) {
+        // خطاهای اعتبارسنجی - تبدیل به رشته قابل نمایش
+        const errorMessages = [];
+        for (const field in err.errors) {
+          errorMessages.push(...err.errors[field]);
+        }
+        message = errorMessages.join("، ");
+      } else {
+        switch (err.status) {
+          case 401:
+            message = "ابتدا باید وارد شوید";
+            break;
+          case 403:
+            message = "شما مجوز حذف کاربر را ندارید";
+            break;
+          case 404:
+            message = "کاربر مورد نظر یافت نشد";
+            break;
+          case 409:
+            message = "این کاربر قابل حذف نیست چون در سیستم وابستگی دارد";
+            break;
+          case 500:
+            message = "خطای داخلی سرور رخ داد";
+            break;
+          default:
+            message = err.message || "خطای ناشناخته";
+        }
+      }
+
+      showError(message);
+    }
   };
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
   };
 
+  // تغییر در تابع handleSubmit برای مدیریت خطاهای اضافه کردن کاربر
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await addUser(form);
-    console.log(form);
-    setIsAddModalOpen(false);
-    fetchUsers(pagination.current_page);
-    setForm({
-      name: "",
-      email: "",
-      password: "",
-      role: "super_admin",
-    });
+    try {
+      await addUser(form);
+      setIsAddModalOpen(false);
+      fetchUsers(pagination.current_page);
+      setForm({
+        name: "",
+        email: "",
+        password: "",
+        role: "super_admin",
+      });
+    } catch (err) {
+      console.error("Error adding user:", err);
+      let message = "خطای ناشناخته ای رخ داد";
+
+      if (err.status === 422 && err.errors) {
+        // خطاهای اعتبارسنجی - تبدیل به رشته قابل نمایش
+        const errorMessages = [];
+        for (const field in err.errors) {
+          errorMessages.push(...err.errors[field]);
+        }
+        message = errorMessages.join("، ");
+      } else {
+        switch (err.status) {
+          case 400:
+            if (err.error === "duplicate_email") {
+              message = "ایمیل قبلاً ثبت شده است";
+            } else if (err.message) {
+              message = err.message;
+            }
+            break;
+          case 403:
+            message = "شما مجوز ایجاد کاربر ندارید";
+            break;
+          case 500:
+            message = "خطای داخلی سرور رخ داد";
+            break;
+          default:
+            message = err.message || "خطای ناشناخته";
+        }
+      }
+
+      showError(message);
+    }
   };
 
+  // تغییر در تابع fetchUsers برای اضافه کردن فیلتر
   const fetchUsers = async (page = 1) => {
     setLoading(true);
     try {
-      const data = await getUsers(page);
+      console.log("Fetching users with role:", filterRole);
+      const data = await getUsers(page, filterRole || null);
       setUsers(data.data || []);
       setPagination({
         current_page: data.current_page,
@@ -224,6 +359,32 @@ const UsersManagement = () => {
       });
     } catch (err) {
       console.error("Error fetching users:", err);
+      let message = "خطای ناشناخته ای رخ داد";
+
+      if (err.status === 422 && err.errors) {
+        // خطاهای اعتبارسنجی - تبدیل به رشته قابل نمایش
+        const errorMessages = [];
+        for (const field in err.errors) {
+          errorMessages.push(...err.errors[field]);
+        }
+        message = errorMessages.join("، ");
+      } else {
+        switch (err.status) {
+          case 401:
+            message = "ابتدا باید وارد شوید";
+            break;
+          case 403:
+            message = "شما مجوز دیدن لیست کاربران را ندارید";
+            break;
+          case 500:
+            message = "خطای داخلی سرور رخ داد";
+            break;
+          default:
+            message = err.message || "خطای ناشناخته";
+        }
+      }
+
+      showError(message);
     } finally {
       setLoading(false);
     }
@@ -234,6 +395,11 @@ const UsersManagement = () => {
       fetchUsers(page);
     }
   };
+
+  // اضافه کردن useEffect برای fetchUsers هنگام تغییر فیلتر
+  useEffect(() => {
+    fetchUsers(1);
+  }, [filterRole]);
 
   useEffect(() => {
     fetchUsers();
@@ -334,13 +500,31 @@ const UsersManagement = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">مدیریت کاربران</h1>
-          <button
-            onClick={openAddModal}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl transition-all shadow-md hover:shadow-lg"
-          >
-            <FaPlus />
-            کاربر جدید
-          </button>
+          <div className="flex items-center gap-4">
+            {/* فیلتر بر اساس نقش */}
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-xl px-4 py-2">
+              <FaFilter className="text-gray-500" />
+              <select
+                value={filterRole}
+                onChange={(e) => setFilterRole(e.target.value)}
+                className="outline-none bg-transparent"
+              >
+                {filterRoles.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={openAddModal}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl transition-all shadow-md hover:shadow-lg"
+            >
+              <FaPlus />
+              کاربر جدید
+            </button>
+          </div>
         </div>
 
         {/* Users Table */}
@@ -383,8 +567,8 @@ const UsersManagement = () => {
                                 : "bg-green-100 text-green-800"
                             }`}
                           >
-                            {roles.find((r) => r.value === user.role)?.label ||
-                              user.role}
+                            {formRoles.find((r) => r.value === user.role)
+                              ?.label || user.role}
                           </span>
                         </td>
                         <td className="px-6 py-4">
@@ -478,7 +662,7 @@ const UsersManagement = () => {
                   type="select"
                   value={form.role}
                   onChange={handleChange}
-                  options={roles}
+                  options={formRoles}
                 />
               </div>
               <div className="flex justify-end gap-3 pt-4">
@@ -540,7 +724,7 @@ const UsersManagement = () => {
                   type="select"
                   value={editForm.role}
                   onChange={handleEditChange}
-                  options={roles}
+                  options={formRoles}
                 />
               </div>
               <div className="flex justify-end gap-3 pt-4 w-full">
@@ -595,8 +779,8 @@ const UsersManagement = () => {
                   </p>
                   <p>
                     <span className="font-medium">نقش:</span>{" "}
-                    {roles.find((r) => r.value === deleteForm.role)?.label ||
-                      deleteForm.role}
+                    {formRoles.find((r) => r.value === deleteForm.role)
+                      ?.label || deleteForm.role}
                   </p>
                 </div>
               </div>
@@ -614,6 +798,34 @@ const UsersManagement = () => {
                 className="px-5 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors shadow-md"
               >
                 بله، حذف کن
+              </button>
+            </div>
+          </div>
+        </ModalOverlay>
+      )}
+
+      {/* Error Modal */}
+      {error.show && (
+        <ModalOverlay onClose={closeErrorModal}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-red-600">خطا</h2>
+              <button
+                onClick={closeErrorModal}
+                className="text-gray-400 hover:text-gray-600 transition p-1 rounded-full hover:bg-gray-100"
+              >
+                <FaTimes size={18} />
+              </button>
+            </div>
+            <div className="my-4">
+              <p className="text-gray-700">{error.message}</p>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={closeErrorModal}
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+              >
+                بستن
               </button>
             </div>
           </div>
