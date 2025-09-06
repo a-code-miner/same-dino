@@ -1,6 +1,7 @@
 // src/contexts/AuthContext.js
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
+import { getItemWithExpiry, setItemWithExpiry } from "@/utils/storage";
 
 const AuthContext = createContext();
 
@@ -9,9 +10,10 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // بارگذاری اطلاعات کاربر از localStorage هنگام لود اولیه
-    const role = localStorage.getItem("role");
-    const username = localStorage.getItem("username");
+    // بارگذاری اطلاعات کاربر از localStorage با بررسی انقضا
+    const role = getItemWithExpiry("role");
+    const username = getItemWithExpiry("username");
+
     if (role && username) {
       setUser({ role, username });
     }
@@ -19,14 +21,17 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (userData) => {
-    localStorage.setItem("role", userData.role);
-    localStorage.setItem("username", userData.name);
-    setUser(userData);
+    // استفاده از تابع جدید برای ذخیره با انقضا
+    setItemWithExpiry("role", userData.role);
+    setItemWithExpiry("username", userData.name);
+    setUser({ role: userData.role, username: userData.name });
   };
 
   const logout = () => {
-    localStorage.removeItem("role");
+    // پاک کردن همه اطلاعات از localStorage
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("username");
+    localStorage.removeItem("role");
     setUser(null);
   };
 

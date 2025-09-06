@@ -5,35 +5,42 @@ import { useRouter } from "next/navigation";
 import { IoIosLogOut } from "react-icons/io";
 
 import { logout } from "@/lib/api";
+import { getItemWithExpiry } from "@/utils/storage";
+import { useAuth } from "@/context/AuthContext";
 
 const TopBar = () => {
   const router = useRouter();
-  const [username, setUsername] = useState();
+  const { user, logout: authLogout } = useAuth();
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUsername = localStorage.getItem("username");
+    // استفاده از هوک useAuth برای دریافت نام کاربر
+    if (user && user.username) {
+      setUsername(user.username);
+    } else {
+      // اگر از context در دسترس نیست، از localStorage با سیستم انقضا بگیر
+      const storedUsername = getItemWithExpiry("username");
       if (storedUsername) {
         setUsername(storedUsername);
       }
     }
-  }, []);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
-      const logOutResult = await logout();
-      if (logOutResult) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("username");
-        localStorage.removeItem("role");
-        router.push("/");
-      }
-      return;
+      // ابتدا از سرور logout کنید
+      await logout();
+
+      // سپس وضعیت احراز هویت را در context به روز کنید
+      authLogout();
+
+      // در نهایت به صفحه اصلی هدایت کنید
+      router.push("/");
     } catch (err) {
       console.log("Failed to logout: ", err);
-      return;
     }
   };
+
   return (
     <div className="fixed right-0 left-0 top-0 h-14 bg-gray-200">
       <div className="flex justify-between items-center my-2 mx-5">

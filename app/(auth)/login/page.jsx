@@ -1,15 +1,36 @@
 // app/(auth)/login/page.js
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const router = useRouter();
-  const { login: authLogin } = useAuth();
+  const { user, loading, login: authLogin } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
+
+  // اگر کاربر قبلاً لاگین کرده باشد، به صفحه مربوطه هدایت می‌شود
+  useEffect(() => {
+    if (user && !loading) {
+      redirectBasedOnRole(user.role);
+    }
+  }, [user, loading, router]);
+
+  const redirectBasedOnRole = (role) => {
+    if (role === "super_admin") {
+      router.push("/super_admin");
+    } else if (role === "canteen") {
+      router.push("/canteen");
+    } else if (role === "parents") {
+      router.push("/parents");
+    } else if (role === "school_manager") {
+      router.push("/school_manager");
+    } else {
+      router.push("/");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,24 +59,30 @@ const Login = () => {
       if (loginResult.user) {
         // استفاده از Context برای به روزرسانی وضعیت کاربر
         authLogin(loginResult.user);
-
-        // هدایت بر اساس نقش
-        if (loginResult.user.role === "super_admin") {
-          router.push("/super_admin");
-        } else if (loginResult.user.role === "canteen") {
-          router.push("/canteen");
-        } else if (loginResult.user.role === "parents") {
-          router.push("/parents");
-        } else if (loginResult.user.role === "school_manager") {
-          router.push("/school_manager");
-        } else {
-          router.push("/");
-        }
+        redirectBasedOnRole(loginResult.user.role);
       }
     } catch (err) {
       console.log("خطا در لاگین:", err);
     }
   };
+
+  // اگر در حال بررسی وضعیت احراز هویت هستیم، نمایش پیام loading
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-xl">در حال بررسی وضعیت احراز هویت...</div>
+      </div>
+    );
+  }
+
+  // اگر کاربر قبلاً لاگین کرده، نمایش پیام و هدایت
+  if (user) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-xl">شما قبلاً وارد شده‌اید، در حال هدایت...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-100">
