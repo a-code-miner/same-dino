@@ -20,6 +20,8 @@ export const ROLE_ACCESS = {
     "/canteen/orders_history",
     "/canteen/sales_history",
     "/canteen/products",
+    "canteen/sales_management",
+    "canteen/orders_management",
   ],
   [ROLES.PARENTS]: ["/parents", "/parents/orders_history"],
   [ROLES.SCHOOL_MANAGER]: ["/school_manager"],

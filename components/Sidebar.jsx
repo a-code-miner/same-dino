@@ -7,6 +7,7 @@ import { FiUsers } from "react-icons/fi";
 import { BsClockHistory } from "react-icons/bs";
 import { FaSellsy } from "react-icons/fa";
 import { PiShippingContainerFill } from "react-icons/pi";
+import { MdOutlineAnalytics } from "react-icons/md";
 import { ImQrcode } from "react-icons/im";
 
 const Sidebar = () => {
@@ -31,16 +32,31 @@ const Sidebar = () => {
       icon: <PiShippingContainerFill />,
     },
     { href: "/super_admin/qrcards", label: "ساخت کد QR", icon: <ImQrcode /> },
-    { href: "/canteen", label: "داشبورد", icon: <PiShippingContainerFill /> },
+    { href: "/canteen", label: "داشبورد", icon: <MdOutlineAnalytics /> },
+    {
+      href: "/canteen/orders_history",
+      label: "تاریخچه سفارش‌ها",
+      icon: <BsClockHistory />,
+    },
+    {
+      href: "/canteen/products",
+      label: "مدیریت اجناس",
+      icon: <PiShippingContainerFill />,
+    },
+    {
+      href: "/canteen/sales_history",
+      label: "تاریخچه فروش‌ها",
+      icon: <FaSellsy />,
+    },
     {
       href: "/parents",
       label: "داشبورد والدین",
-      icon: <PiShippingContainerFill />,
+      icon: <MdOutlineAnalytics />,
     },
     {
       href: "/school_manager",
       label: "داشبورد مدیر مدرسه",
-      icon: <PiShippingContainerFill />,
+      icon: <MdOutlineAnalytics />,
     },
   ];
 
