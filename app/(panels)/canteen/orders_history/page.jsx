@@ -8,31 +8,31 @@ const OrdersHistory = () => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // const [ordersHistory, setOrdersHistory] = useState([]);
-  const [ordersHistory, setOrdersHistory] = useState([
-    {
-      order_id: 1,
-      parent: { id: 101, name: "والدین 1" },
-      student: { id: 201, name: "شاگرد 1" },
-      product: { product_id: 301, name: "شیر", price: 5000, quantity: 2 },
-      total_price: 10000,
-      status: "delivered",
-      order_date_time: "2023-10-01T10:00:00Z",
-      delivered_at: "2023-10-01T10:30:00Z",
-      seller: { id: 401, name: "فروشنده 1" },
-    },
-    {
-      order_id: 2,
-      parent: { id: 102, name: "والدین 2" },
-      student: { id: 202, name: "شاگرد 2" },
-      product: { product_id: 302, name: "ساندویچ", price: 15000, quantity: 1 },
-      total_price: 15000,
-      status: "pending",
-      order_date_time: "2023-10-02T11:00:00Z",
-      delivered_at: null,
-      seller: { id: 402, name: "فروشنده 2" },
-    },
-  ]);
+  const [ordersHistory, setOrdersHistory] = useState([]);
+  // const [ordersHistory, setOrdersHistory] = useState([
+  //   {
+  //     order_id: 1,
+  //     parent: { id: 101, name: "والدین 1" },
+  //     student: { id: 201, name: "شاگرد 1" },
+  //     product: { product_id: 301, name: "شیر", price: 5000, quantity: 2 },
+  //     total_price: 10000,
+  //     status: "delivered",
+  //     order_date_time: "2023-10-01T10:00:00Z",
+  //     delivered_at: "2023-10-01T10:30:00Z",
+  //     seller: { id: 401, name: "فروشنده 1" },
+  //   },
+  //   {
+  //     order_id: 2,
+  //     parent: { id: 102, name: "والدین 2" },
+  //     student: { id: 202, name: "شاگرد 2" },
+  //     product: { product_id: 302, name: "ساندویچ", price: 15000, quantity: 1 },
+  //     total_price: 15000,
+  //     status: "pending",
+  //     order_date_time: "2023-10-02T11:00:00Z",
+  //     delivered_at: null,
+  //     seller: { id: 402, name: "فروشنده 2" },
+  //   },
+  // ]);
   const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [pagination, setPagination] = useState({
@@ -80,7 +80,7 @@ const OrdersHistory = () => {
           : []
       );
 
-      // setOrdersHistory(flattenedData);
+      setOrdersHistory(flattenedData);
       setPagination({
         page: data.pagination?.page || 1,
         limit: data.pagination?.limit || 10,
