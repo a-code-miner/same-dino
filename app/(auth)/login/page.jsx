@@ -13,10 +13,15 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
 
-  // اگر کاربر قبلاً لاگین کرده باشد، به صفحه مربوطه هدایت می‌شود
+
+  // فقط اگر کاربر لاگین کرده و در صفحه login است، پیام و هدایت را نمایش بده
   useEffect(() => {
     if (user && !loading) {
-      redirectBasedOnRole(user.role);
+      const timer = setTimeout(() => {
+        redirectBasedOnRole(user.role);
+      }, 1000);
+
+      return () => clearTimeout(timer);
     }
   }, [user, loading, router]);
 
@@ -61,8 +66,12 @@ const Login = () => {
     try {
       const loginResult = await login(form.email, form.password);
 
-      if (loginResult.user) {
-        authLogin(loginResult.user);
+      if (loginResult.user && loginResult.token) {
+        authLogin({
+          role: loginResult.user.role,
+          name: loginResult.user.name,
+          token: loginResult.token,
+        });
         redirectBasedOnRole(loginResult.user.role);
       }
     } catch (err) {
@@ -96,11 +105,23 @@ const Login = () => {
     );
   }
 
-  // اگر کاربر قبلاً لاگین کرده، نمایش پیام و هدایت
-  if (user) {
+
+  // فقط اگر کاربر لاگین کرده و در صفحه login است، پیام را نمایش بده
+  // (در غیر این صورت، فرم ورود را نمایش بده)
+  const [showAlreadyLoggedIn, setShowAlreadyLoggedIn] = useState(false);
+  useEffect(() => {
+    if (!loading && user) {
+      setShowAlreadyLoggedIn(true);
+      // پیام را فقط برای مدت کوتاهی نمایش بده
+      const timeout = setTimeout(() => setShowAlreadyLoggedIn(false), 1500);
+      return () => clearTimeout(timeout);
+    }
+  }, [user, loading]);
+
+  if (showAlreadyLoggedIn) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-xl">شما قبلاً وارد شده‌اید، در حال هدایت...</div>
+        <div className="text-xl">در حال هدایت به صفحه اصلی...</div>
       </div>
     );
   }

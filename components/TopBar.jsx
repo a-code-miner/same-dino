@@ -30,7 +30,8 @@ const TopBar = () => {
     try {
       await logout();
       authLogout();
-      router.push("/");
+      router.push("/login");
+      router.refresh(); // اضافه کردن این خطا برای رفرش صفحه
     } catch (err) {
       console.log("Failed to logout: ", err);
 
