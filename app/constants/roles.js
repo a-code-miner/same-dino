@@ -1,9 +1,9 @@
 // src/constants/roles.js
 export const ROLES = {
   SUPER_ADMIN: "super_admin",
-  CANTEEN: "canteen",
-  PARENTS: "parents",
-  SCHOOL_MANAGER: "school_manager",
+  STAFF: "staff",
+  PARENT: "parent",
+  ADMIN: "admin",
 };
 
 export const ROLE_ACCESS = {
@@ -15,14 +15,14 @@ export const ROLE_ACCESS = {
     "/super_admin/products",
     "/super_admin/qrcards",
   ],
-  [ROLES.CANTEEN]: [
-    "/canteen",
-    "/canteen/orders_history",
-    "/canteen/sales_history",
-    "/canteen/products",
-    "canteen/sales_management",
-    "canteen/orders_management",
+  [ROLES.STAFF]: [
+    "/staff",
+    "/staff/orders_history",
+    "/staff/sales_history",
+    "/staff/products",
+    "staff/sales_management",
+    "staff/orders_management",
   ],
-  [ROLES.PARENTS]: ["/parents", "/parents/orders_history"],
-  [ROLES.SCHOOL_MANAGER]: ["/school_manager"],
+  [ROLES.PARENT]: ["/parent", "/parent/orders_history"],
+  [ROLES.ADMIN]: ["/admin"],
 };

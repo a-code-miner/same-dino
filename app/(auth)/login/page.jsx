@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 const Login = () => {
   const router = useRouter();
@@ -22,12 +23,12 @@ const Login = () => {
   const redirectBasedOnRole = (role) => {
     if (role === "super_admin") {
       router.push("/super_admin");
-    } else if (role === "canteen") {
-      router.push("/canteen");
-    } else if (role === "parents") {
-      router.push("/parents");
-    } else if (role === "school_manager") {
-      router.push("/school_manager");
+    } else if (role === "staff") {
+      router.push("/staff");
+    } else if (role === "parent") {
+      router.push("/parent");
+    } else if (role === "admin") {
+      router.push("/admin");
     } else {
       router.push("/");
     }
@@ -152,6 +153,9 @@ const Login = () => {
             ورود
           </button>
         </form>
+        <Link href="/register" className="mt-4 block text-center text-blue-600 hover:underline">
+          حساب کاربری ندارید؟ ثبت نام کنید
+        </Link>
       </div>
     </div>
   );

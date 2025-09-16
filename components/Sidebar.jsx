@@ -32,30 +32,30 @@ const Sidebar = () => {
       icon: <PiShippingContainerFill />,
     },
     { href: "/super_admin/qrcards", label: "ساخت کد QR", icon: <ImQrcode /> },
-    { href: "/canteen", label: "داشبورد", icon: <MdOutlineAnalytics /> },
+    { href: "/staff", label: "داشبورد", icon: <MdOutlineAnalytics /> },
     {
-      href: "/canteen/orders_history",
+      href: "/staff/orders_history",
       label: "تاریخچه سفارش‌ها",
       icon: <BsClockHistory />,
     },
     {
-      href: "/canteen/products",
+      href: "/staff/products",
       label: "مدیریت اجناس",
       icon: <PiShippingContainerFill />,
     },
     {
-      href: "/canteen/sales_history",
+      href: "/staff/sales_history",
       label: "تاریخچه فروش‌ها",
       icon: <FaSellsy />,
     },
     {
-      href: "/parents",
+      href: "/parent",
       label: "داشبورد والدین",
       icon: <MdOutlineAnalytics />,
     },
     {
-      href: "/school_manager",
-      label: "داشبورد مدیر مدرسه",
+      href: "/admin",
+      label: "داشبورد مدیر مکتب",
       icon: <MdOutlineAnalytics />,
     },
   ];

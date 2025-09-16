@@ -101,16 +101,16 @@ const UsersManagement = () => {
   const filterRoles = [
     { value: "", label: "همه کاربران" },
     { value: "super_admin", label: "مدیر کل" },
-    { value: "school_manager", label: "مدیر مکتب" },
-    { value: "canteen", label: "مسئول کانتین" },
-    { value: "parents", label: "والدین" },
+    { value: "admin", label: "مدیر مکتب" },
+    { value: "staff", label: "مسئول کانتین" },
+    { value: "parent", label: "والدین" },
   ];
 
   const formRoles = [
     { value: "super_admin", label: "مدیر کل" },
-    { value: "school_manager", label: "مدیر مکتب" },
-    { value: "canteen", label: "مسئول کانتین" },
-    { value: "parents", label: "والدین" },
+    { value: "admin", label: "مدیر مکتب" },
+    { value: "staff", label: "مسئول کانتین" },
+    { value: "parent", label: "والدین" },
   ];
 
   const [form, setForm] = useState({
@@ -448,11 +448,10 @@ const UsersManagement = () => {
         key="prev"
         onClick={() => changePage(pagination.current_page - 1)}
         disabled={pagination.current_page === 1}
-        className={`px-3 py-1 rounded-lg ${
-          pagination.current_page === 1
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
+        className={`px-3 py-1 rounded-lg ${pagination.current_page === 1
+          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
       >
         <FaChevronRight />
       </button>
@@ -464,11 +463,10 @@ const UsersManagement = () => {
         <button
           key={i}
           onClick={() => changePage(i)}
-          className={`px-3 py-1 rounded-lg ${
-            i === pagination.current_page
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
+          className={`px-3 py-1 rounded-lg ${i === pagination.current_page
+            ? "bg-blue-600 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
         >
           {i}
         </button>
@@ -481,11 +479,10 @@ const UsersManagement = () => {
         key="next"
         onClick={() => changePage(pagination.current_page + 1)}
         disabled={pagination.current_page === pagination.last_page}
-        className={`px-3 py-1 rounded-lg ${
-          pagination.current_page === pagination.last_page
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
+        className={`px-3 py-1 rounded-lg ${pagination.current_page === pagination.last_page
+          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
       >
         <FaChevronLeft />
       </button>
@@ -557,15 +554,14 @@ const UsersManagement = () => {
                         <td className="px-6 py-4">{user.email}</td>
                         <td className="px-6 py-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              user.role === "super_admin"
-                                ? "bg-purple-100 text-purple-800"
-                                : user.role === "school_manager"
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${user.role === "super_admin"
+                              ? "bg-purple-100 text-purple-800"
+                              : user.role === "admin"
                                 ? "bg-blue-100 text-blue-800"
-                                : user.role === "canteen"
-                                ? "bg-amber-100 text-amber-800"
-                                : "bg-green-100 text-green-800"
-                            }`}
+                                : user.role === "staff"
+                                  ? "bg-amber-100 text-amber-800"
+                                  : "bg-green-100 text-green-800"
+                              }`}
                           >
                             {formRoles.find((r) => r.value === user.role)
                               ?.label || user.role}

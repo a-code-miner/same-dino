@@ -1,6 +1,6 @@
 import React from "react";
 
-const ParentsOrdersHistory = () => {
+const ParentOrdersHistory = () => {
   return (
     <div className="p-8 text-center">
       <h1 className="text-2xl font-bold mb-4">تاریخچه سفارش‌های والدین</h1>
@@ -9,4 +9,4 @@ const ParentsOrdersHistory = () => {
   );
 };
 
-export default ParentsOrdersHistory;
+export default ParentOrdersHistory;
